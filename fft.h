@@ -211,18 +211,22 @@ static void fftshift(float** mat, int lgth, int wdth) {
 static void multComplex(float** matrealout, float** matimout, float** matreal1in, float** matim1in, float** matreal2in, float** matim2in, int lgth, int wdth) {
     int i, j;
 
-    for(i = 0; i < lgth; i++) for(j = 0; j < wdth; j++) {
-        matrealout[i][j] = matreal1in[i][j] * matreal2in[i][j] - matim1in[i][j] * matim2in[i][j];
-        matimout[i][j] = matreal1in[i][j] * matim2in[i][j] + matreal2in[i][j] * matim1in[i][j];
+    for(i = 0; i < lgth; i++) { 
+        for(j = 0; j < wdth; j++) {
+            matrealout[i][j] = matreal1in[i][j] * matreal2in[i][j] - matim1in[i][j] * matim2in[i][j];
+            matimout[i][j] = matreal1in[i][j] * matim2in[i][j] + matreal2in[i][j] * matim1in[i][j];
+        }
     }
 }
 
 static void square(float** matrealout, float** matimout, float** matrealin, float** matimin, int lgth, int wdth) {
     int i, j;
 
-    for(i = 0; i < lgth; i++) for(j = 0; j < wdth; j++) {
-        matrealout[i][j] = SQUARE(matrealin[i][j]) - SQUARE(matimin[i][j]);
-        matimout[i][j] = 2 * matrealin[i][j] * matimin[i][j];
+    for(i = 0; i < lgth; i++) { 
+        for(j = 0; j < wdth; j++) {
+            matrealout[i][j] = SQUARE(matrealin[i][j]) - SQUARE(matimin[i][j]);
+            matimout[i][j] = 2 * matrealin[i][j] * matimin[i][j];
+        }
     }
 }
 
