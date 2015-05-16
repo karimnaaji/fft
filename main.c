@@ -2,6 +2,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+void free2d(float** p) { 
+    free(p[0]);
+    free(p);
+}
+
 float** malloc2d(int v, int h) {
     int i;
     float** m;
@@ -12,11 +17,10 @@ float** malloc2d(int v, int h) {
 
     for (i = 0; i < v; i++, p += h) {
         m[i] = p;
-        *p = 0.0f;
     }
 
     return m;
- }
+}
 
 void testfft(char* filename) {
     unsigned char *data;
@@ -34,9 +38,11 @@ void testfft(char* filename) {
 
     for (int i = 0; i < x; ++i) {
         for (int j = 0; j < y; ++j) {
-
+            m[i][j] = (float) data[i + j * x];
         }
     }
+
+    free2d(m);
 
     stbi_image_free(data);
 }
