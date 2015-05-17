@@ -58,7 +58,7 @@ void center(float** in, float** out, int length, int width) {
 void testfft(char* filename, char* spectrum) {
     unsigned char* data;
     unsigned int* modfft;
-    float** mr, **mg, **mb, **modulus, **mim;
+    float** m, **modulus, **mim;
     int x, y, comp;
     int offset = 0;
 
@@ -76,9 +76,7 @@ void testfft(char* filename, char* spectrum) {
         goto error;
     }
 
-    mr = malloc2d(x, y);
-    mg = malloc2d(x, y);
-    mb = malloc2d(x, y);
+    m = malloc2d(x, y);
     modulus = malloc2d(x, y);
 
     printf("width %d, height %d\n", x, y);
@@ -86,20 +84,19 @@ void testfft(char* filename, char* spectrum) {
     for (int j = 0; j < y; ++j) {
         for (int i = 0; i < x; ++i) { 
             int off = i + j * x + offset;
-            mr[i][j] = (float) data[off];
-            mg[i][j] = (float) data[off + 1];
-            mb[i][j] = (float) data[off + 2];
-            offset += comp-1;
+            m[i][j] = (float) data[off] + (float) data[off + 1] + (float) data[off + 2];
+            m[i][j] /= comp - 1;
+            offset += comp - 1;
         }
     }
 
     mim = malloc2d(x, y);
 
     // perform fast fourier transform on the 2d signal (red channel)
-    fft(mr, mim, x, y);
+    fft(m, mim, x, y);
 
     // compute the modulus of the fourier transform
-    mod(modulus, mr, mim, x, y);
+    mod(modulus, m, mim, x, y);
 
     // shift the fourier transform to move the zero frequency in center
     fftshift(modulus, x, y);
@@ -107,13 +104,13 @@ void testfft(char* filename, char* spectrum) {
     // expand the modulus (for viewing purposes)
     mult(modulus, 100.0f, x, y); 
 
-    center(modulus, mr, x, y);
+    center(modulus, m, x, y);
 
     modfft = (unsigned int*) malloc(sizeof(unsigned int) * x * y * comp);
 
     for (int j = 0; j < y; ++j) {
         for (int i = 0; i < x; ++i) {
-            unsigned char v = (unsigned char)mr[i][j];
+            unsigned char v = (unsigned char)m[i][j];
             modfft[i + j * x] = toRGBA(v, v, v, 255);
         }
     }
@@ -126,9 +123,7 @@ void testfft(char* filename, char* spectrum) {
 
     free2d(modulus);
     free2d(mim);
-    free2d(mr);
-    free2d(mg);
-    free2d(mb);
+    free2d(m);
     free(modfft);
 
 error:
