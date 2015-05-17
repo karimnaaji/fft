@@ -59,8 +59,7 @@ void testfft(char* filename, char* spectrum) {
     unsigned char* data;
     unsigned int* modfft;
     float** m, **modulus, **mim;
-    int x, y, comp;
-    int offset = 0;
+    int x, y, i, j, comp, res, offset;
 
     FILE *file = fopen(filename, "rb");
 
@@ -81,8 +80,9 @@ void testfft(char* filename, char* spectrum) {
 
     printf("width %d, height %d\n", x, y);
 
-    for (int j = 0; j < y; ++j) {
-        for (int i = 0; i < x; ++i) { 
+    offset = 0;
+    for (j = 0; j < y; ++j) {
+        for (i = 0; i < x; ++i) { 
             int off = i + j * x + offset;
             m[i][j] = (float) data[off] + (float) data[off + 1] + (float) data[off + 2];
             m[i][j] /= comp - 1;
@@ -108,14 +108,14 @@ void testfft(char* filename, char* spectrum) {
 
     modfft = (unsigned int*) malloc(sizeof(unsigned int) * x * y * comp);
 
-    for (int j = 0; j < y; ++j) {
-        for (int i = 0; i < x; ++i) {
+    for (j = 0; j < y; ++j) {
+        for (i = 0; i < x; ++i) {
             unsigned char v = (unsigned char)m[i][j];
             modfft[i + j * x] = toRGBA(v, v, v, 255);
         }
     }
 
-    int res = stbi_write_png(spectrum, x, y, comp, modfft, 0);
+    res = stbi_write_png(spectrum, x, y, comp, modfft, 0);
 
     if (!res) {
         printf("Error saving file\n");
@@ -143,5 +143,5 @@ int main(int argc, char** argv) {
         testfft(argv[1], "spectrum.png");
     }
 
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
